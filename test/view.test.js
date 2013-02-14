@@ -1,28 +1,30 @@
-var
-  bogart = require('../lib/bogart'),
-  view   = require('../lib/view'),
-  jsgi   = require('jsgi'),
-  sys    = require('sys'),
-  when   = require('promised-io/promise').when,
-  assert = require('assert'),
-  fixturesDir = process.cwd() + '/test/fixtures';
+var bogart       = require('../lib/bogart')
+  , view         = require('../lib/view')
+  , jsgi         = require('jsgi')
+  , when         = bogart.q.when
+  , path         = require('path')
+  , test         = require('tap').test
+  , plan         = require('tap').plan
+  , fixturesPath = path.join(__dirname, 'fixtures');
 
-exports['test render haml'] = function() {
-  var viewEngine = bogart.viewEngine('haml', __dirname+'/fixtures');
+test('test render mustache', function(t) {
+  var viewEngine = bogart.viewEngine('mustache', fixturesPath);
   
-  return when(viewEngine.render('index.haml', { layout: false }), function(str) {
-    assert.equal(str, '<h1>Hello World</h1>');
+  when(viewEngine.render('index.mustache', { layout: false }), function(str) {
+    t.equal(str, '<h1>Hello World from Mustache</h1>');;
+    t.end();
+  }, function(err) {
+    t.fail(err);
   });
-}
+});
 
-exports['test render mustache'] = function() {
-  var viewEngine = bogart.viewEngine("mustache", __dirname+'/fixtures');
+test('test render mustache with partials', function(t) {
+  var viewEngine = bogart.viewEngine('mustache', fixturesPath);
   
-  return when(viewEngine.render('index.mustache', { layout: false }), function(str) {
-    assert.equal(str, '<h1>Hello World from Mustache</h1>\n');
+  when(viewEngine.render('partial-test.mustache', { layout: false, locals: { greeting: {} }, partials: { greeting: 'greeting.mustache' } }), function(str) {
+    t.equal(str, "<h1>Hello World from Mustache</h1><p>With Partial</p>");
+    t.end();
+  }, function(err) {
+    t.fail(err);
   });
-}
-
-if(require.main == module) {
-  require("patr/runner").run(exports);
-}
+});

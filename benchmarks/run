@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-ABFLAGS=${ABFLAGS-"-n 2000 -c 50 -k"}
+ABFLAGS=${ABFLAGS-"-n 5000 -c 500 -k"}
 ADDR=${ADDR-http://0.0.0.0:8080/}
 AB=${AB-ab}
 
@@ -27,7 +27,7 @@ bm(){
   	log running $file
   	case $file in
   		*.js)
-  		  node /usr/local/bin/nodules $file &
+  		  node $file &
   		  sleep 2
   		  ;;
   		*.thin.ru)
@@ -57,5 +57,5 @@ echo $ABFLAGS > results/flags
 # Run benchmarks
 log $AB $ABFLAGS $ADDR
 bm hello-world
-bm alternative-routing
+#bm alternative-routing
 bm mustache-layout
